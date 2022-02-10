@@ -53,13 +53,16 @@ def year_sorting(year, df):
     location = []
     country = []
     film_name = []
+    coordinates = []
     for i, row in df.iterrows():
         if int(row['Year']) == year:
+            film_name.append(row['Film Name'])
             city.append(row['City'])
             location.append(row['Location'])
             country.append(row['Country'])
-            film_name.append(row['Film Name'])
-    data = {'City': city, 'Location': location, 'Country': country, 'Film Name': film_name}
+            coordinates.append(row['Coordinates'])
+
+    data = {'City': city, 'Location': location, 'Country': country, 'Film Name': film_name, 'Coordinates': coordinates}
     new_df = pd.DataFrame(data)
     return new_df
 
@@ -74,14 +77,11 @@ def distance(lo, user_la, user_lo):
     distan = haversine.haversine(lo, loc_1)
     return distan
 
-def step_by_step(first_layer: bool):
+def step_by_step():
     """
     This is a function that puts together all the previous ones and returns sorted final DataFrame
     """
-    if first_layer:
-        df = year_sorting(reading_input()[0], d_f)
-    else:
-        df = d_f
+    df = d_f
     coord = []
     for i, row in df.iterrows():
         address = ", ".join([row['City'], row['Location'], row['Country']])
@@ -91,10 +91,6 @@ def step_by_step(first_layer: bool):
     for i, row in df.iterrows():
         try:
             distant = distance(row['Coordinates'], reading_input()[1], reading_input()[2])
-            print(row['Coordinates'])
-            print(reading_input()[1])
-            print(reading_input()[2])
-            print(distant)
             distance_list.append(distant)
         except TypeError:
             distance_list.append(None)
@@ -111,7 +107,7 @@ def create_map(df1, df2):
     fg = folium.FeatureGroup(name=f"The nearest films of {year} year")
     fg2 = folium.FeatureGroup(name="The nearest films of all years")
     df1 = df1.drop_duplicates(subset="Coordinates")
-    df2 = df2.drop_duplicates(subset='Coordinates')
+    df2 = df2.drop_duplicates(subset="Coordinates")
     coordinate = list(df1['Coordinates'])[:10]
     first_layer = list(df1['Film Name'])[:10]
     coordinate2 = list(df2['Coordinates'])[:15]
@@ -130,6 +126,6 @@ if __name__ == "__main__":
     arcgis = ArcGIS(timeout=10)
     nominatim = Nominatim(timeout=10, user_agent="justme")
     geocoders = [arcgis, nominatim]
-    first_layer = step_by_step(True)
-    second_layer = step_by_step(False)
+    second_layer = step_by_step()
+    first_layer = year_sorting(reading_input()[0], second_layer)
     create_map(first_layer, second_layer)
