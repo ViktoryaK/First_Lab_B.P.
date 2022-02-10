@@ -7,3 +7,4 @@
 ```bash
  python main.py 2015 49.83826 24.02324 locations.list  
 ```
+![Screenshot from 2022-02-11 00-13-04](https://user-images.githubusercontent.com/96166901/153505598-7f175776-23b1-4869-a991-f3398ceac39f.png)
